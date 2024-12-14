@@ -52,7 +52,4 @@ try {
     $title = 'An error has occurred';
     $output = 'Database error: ' . $e->getMessage();
 }
-
-// Include main layout
-include 'templates\layout.html.php';
 ?>
