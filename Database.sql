@@ -8,7 +8,7 @@ CREATE TABLE users(
     username VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255),
-    isAdmin TINYINT(1) NOT NULL, --boolean equivalent in SQL
+    isAdmin TINYINT(1) NOT NULL,
     isDeleted TINYINT(1) NOT NULL DEFAULT 0,
     profile_picture VARCHAR(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -81,7 +81,7 @@ CREATE TABLE comments(
     FOREIGN KEY (answer) REFERENCES answers(answer_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO answers(isDeleted, time, author, answer, comment_content) VALUES
+INSERT INTO comments(isDeleted, time, author, answer, comment_content) VALUES
 (0, '2024-12-3 15:10:00', 4, 1, 'what? i thought we do'),
 (0, '2024-12-3 15:11:00', 2, 1, 'wait lemme check it again'),
 (0, '2024-12-3 15:14:00', 2, 1, 'oh dang, we actually do'),
