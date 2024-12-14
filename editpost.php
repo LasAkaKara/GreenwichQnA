@@ -9,19 +9,18 @@ if (!isset($_SESSION['user_id'])) {
 try{
     include 'includes\DatabaseConnector.php';
     include 'includes\DatabaseFunctions.php';
-
-    // Check if form is submitted and all required fields are set
+    // If the form is submitted, update the post
     if(isset ($_POST['submit']) &&isset($_POST['post_content']) && isset($_POST['title'])){
+        // Set upload type to posts to access posts folder
         $upload_type = 'posts';
         include 'actions\upload.php';
-        // Initialize update parameters
+        // Update the post
         updatePost($pdo, $_POST['post_id'], $_POST['post_content'], $_POST['title'], $target_file);
-        //Redirect to feed after successful update
+        // Redirect to feed page
         header('location: feed.php');
         exit();
     }
     else{
-        // Fetch post data for editing
         $posts = getPost($pdo, $_GET['id']);
 
         $title= 'Edit Post';

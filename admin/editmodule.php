@@ -16,20 +16,20 @@ try {
                 SET module_name = :module_name, 
                     lecturer = :lecturer 
                 WHERE module_id = :module_id';
-        //Execute query
+        // Complete the SQL query
         query($pdo, $sql, [
             'module_id' => $_POST['module_id'],
             'module_name' => $_POST['module_name'],
             'lecturer' => $_POST['lecturer']
         ]);
-        //Redirect to manage modules after successful update
+        // Redirect to manage_modules page
         header('location: manage_modules.php');
         exit();
     } else {
         // Get module details
         $sql = 'SELECT * FROM modules WHERE module_id = :id AND isDeleted = 0';
         $module = query($pdo, $sql, ['id' => $_GET['id']])->fetch();
-
+        // If the module is not found, redirect to manage_modules page
         if (!$module) {
             header('Location: manage_modules.php');
             exit();

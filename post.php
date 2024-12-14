@@ -11,61 +11,59 @@ try {
     include 'includes\DatabaseConnector.php';
     include 'includes\DatabaseFunctions.php';
 
-    // Check if post ID is provided
-    if (!isset($_GET['id'])) {
-        throw new Exception('No post specified');
-    }
-
-    $currentPage = 'post';
-
-    // Get post details with author info and counts
-    $sql = 'SELECT posts.*, users.username as authorname,
-            (SELECT COUNT(*) FROM answers WHERE post = posts.post_id AND isDeleted = 0) as answers_count,
-            (SELECT COUNT(*) FROM likes WHERE post = posts.post_id AND isLike = 1) as like_count,
-            (SELECT COUNT(*) FROM likes WHERE post = posts.post_id AND isLike = 0) as dislike_count,
-            (SELECT isLike FROM likes WHERE post = posts.post_id AND user = :user_id) as user_like
-            FROM posts 
-            LEFT JOIN users ON posts.author = users.user_id
-            WHERE post_id = :id AND posts.isDeleted = 0';
-
-    $post = query($pdo, $sql, [
-        'id' => $_GET['id'],
-        'user_id' => $_SESSION['user_id']
+    // Get post with author information
+    $sql_post = 'SELECT posts.*, users.username as author_name,
+    (SELECT COUNT(*) FROM likes WHERE post = posts.post_id AND isLike = 1) as like_count,
+    (SELECT COUNT(*) FROM likes WHERE post = posts.post_id AND isLike = 0) as dislike_count,
+    (SELECT isLike FROM likes WHERE post = posts.post_id AND user = :user_id) as user_like
+    FROM posts JOIN users ON posts.author = users.user_id
+    WHERE post_id = :post_id;';
+    // Query to get post with author information
+    $post = query($pdo, $sql_post, [
+    'post_id' => $_GET['id'],
+    'user_id' => $_SESSION['user_id']
     ])->fetch();
 
-    // Check if post exists
-    if (!$post) {
-        throw new Exception('Post not found');
+    // Get answers with author information and comment counts
+    $sql_answers = 'SELECT answers.*, users.username as author_name,
+                    (SELECT COUNT(*) FROM comments WHERE answer_id = answers.answer_id) as comment_count
+                    FROM answers 
+                    LEFT JOIN users ON answers.author = users.user_id 
+                    WHERE post = ? AND answers.isDeleted = "0"
+                    ORDER BY answers.time DESC';
+    $answers = query($pdo, $sql_answers, [$_GET['id']])->fetchAll();
+
+    // Get all comments for all answers
+    $sql_comments = 'SELECT comments.*, users.username as author_name, answers.answer_id
+                    FROM comments 
+                    LEFT JOIN users ON comments.author = users.user_id
+                    LEFT JOIN answers ON comments.answer = answers.answer_id
+                    WHERE answers.post = ?
+                    ORDER BY comments.time ASC';
+    $comments = query($pdo, $sql_comments, [$_GET['id']])->fetchAll();
+
+    // Organize comments by answer_id for easier access in template
+    $comments_by_answer = [];
+    foreach ($comments as $comment) {
+        $answer_id = $comment['answer_id'];
+        if (!isset($comments_by_answer[$answer_id])) {
+            $comments_by_answer[$answer_id] = [];
+        }
+        $comments_by_answer[$answer_id][] = $comment;
     }
-
-    // Get answers for the post
-    $sql = 'SELECT answers.*, users.username, 
-            (SELECT COUNT(*) FROM likes WHERE post = answers.answer_id AND isLike = 1) as like_count,
-            (SELECT COUNT(*) FROM likes WHERE post = answers.answer_id AND isLike = 0) as dislike_count,
-            (SELECT isLike FROM likes WHERE post = answers.answer_id AND user = :user_id) as user_like
-            FROM answers 
-            LEFT JOIN users ON answers.author = users.user_id
-            WHERE answers.post = :post_id AND answers.isDeleted = 0
-            ORDER BY answers.time DESC';
-
-    $answers = query($pdo, $sql, [
-        'post_id' => $_GET['id'],
-        'user_id' => $_SESSION['user_id']
-    ]);
-
-    $title = $post['title'];
     
-    // Load post template
+    $title = htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8');
+    
+    // Buffer the output
     ob_start();
     include 'templates\post.html.php';
     $output = ob_get_clean();
-
-} catch (Exception $e) {
+    
+} catch(PDOException $e) {
     $title = 'An error has occurred';
     $output = $e->getMessage();
 }
 
-// Include main layout
 include 'templates\layout.html.php';
 ?>
 

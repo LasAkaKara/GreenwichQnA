@@ -1,6 +1,6 @@
--- Database configuration
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION; ---To execute multiple queries as a single unit, avoid partial execution
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 CREATE TABLE users(
@@ -12,16 +12,7 @@ CREATE TABLE users(
     isDeleted TINYINT(1) NOT NULL DEFAULT 0,
     profile_picture VARCHAR(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
--- Users table: Stores user information
--- user_id: Unique identifier for each user
--- username: User's display name
--- email: User's email (unique)
--- password: Hashed password
--- isAdmin: Boolean flag for admin privileges
--- isDeleted: Soft delete flag
--- profile_picture: Path to user's avatar
 
--- Sample user data with different roles
 INSERT INTO users(username, email, password, isAdmin, isDeleted, profile_picture) VALUES
 ('laskara', 'bachhlgcs230324@fpt.edu.vn', 'b26d5c34979df26cf5aec1e4c6d4bd59', 1, 0,'uploads/avatar/las.jpg'),
 ('lethanhminh', 'minh@gmail.com', '616a1287fd70fd0e5feecef121abb685', 0, 0,'uploads/avatar/minh.jpg'),
@@ -35,19 +26,11 @@ CREATE TABLE modules(
     lecturer VARCHAR(255),
     isDeleted TINYINT(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
--- Modules table: Stores course module information
--- module_id: Unique identifier for each module
--- module_name: Name of the module
--- lecturer: Name of module lecturer
--- isDeleted: Soft delete flag
 
-
--- Sample module data
 INSERT INTO modules(module_id, module_name, lecturer, isDeleted) VALUES
 ('COMP1773', 'UI/UX Design', 'Ms Chi', 0),
 ('COMP1770', 'Project Management', 'Mrs Duong', 0),
 ('COMP1841', 'Web Development 1', 'Mr Khanh', 0);
-
 
 CREATE TABLE posts(
     post_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -61,18 +44,7 @@ CREATE TABLE posts(
     FOREIGN KEY (author) REFERENCES users(user_id),
     FOREIGN KEY (module) REFERENCES modules(module_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
--- Posts table: Stores user questions/posts
--- post_id: Unique identifier for each post
--- title: Post title
--- post_content: Main content of the post
--- isDeleted: Soft delete flag
--- time: Timestamp of post creation
--- author: Foreign key to users table
--- module: Foreign key to modules table
--- image_path: Path to attached image
 
-
--- Sample post data
 INSERT INTO posts(title, isDeleted, time, author, module, post_content, image_path) VALUES
 ('Do we have class this week?', 0, '2024-12-3 14:34:42', 3, 'COMP1770', 'tomorrow class is not on the timetable. Did miss Duong said we are not going to class this week? I dont remember her saying anythign last time', 'uploads/posts/timetable.jpg'),
 ('How do yall make a Gantt Chart', 0, '2024-11-14 13:00:00', 2, 'COMP1770', 'We talked about Gantt Chart Last week but I was missing. How do we do this again? Any ideas?', 'uploads/posts/gantt.png'),
@@ -90,16 +62,7 @@ CREATE TABLE answers(
     FOREIGN KEY (author) REFERENCES users(user_id),
     FOREIGN KEY (post) REFERENCES posts(post_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
--- Answers table: Stores responses to posts
--- answer_id: Unique identifier for each answer
--- answer_content: Content of the answer
--- isDeleted: Soft delete flag
--- time: Timestamp of answer creation
--- author: Foreign key to users table
--- post: Foreign key to posts table
 
-
--- Sample answer data
 INSERT INTO answers(isDeleted, time, author, post, answer_content) VALUES
 (0, '2024-12-3 15:00:00', 2, 1, 'nah we dont'),
 (0, '2024-12-3 15:45:00', 4, 1, 'i think we do, i still see it on the ap web'),
@@ -117,16 +80,7 @@ CREATE TABLE comments(
     FOREIGN KEY (author) REFERENCES users(user_id),
     FOREIGN KEY (answer) REFERENCES answers(answer_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
--- Comments table: Stores comments on answers
--- comment_id: Unique identifier for each comment
--- comment_content: Content of the comment
--- isDeleted: Soft delete flag
--- time: Timestamp of comment creation
--- author: Foreign key to users table
--- answer: Foreign key to answers table
 
-
--- Sample comment data
 INSERT INTO answers(isDeleted, time, author, answer, comment_content) VALUES
 (0, '2024-12-3 15:10:00', 4, 1, 'what? i thought we do'),
 (0, '2024-12-3 15:11:00', 2, 1, 'wait lemme check it again'),
@@ -146,15 +100,8 @@ CREATE TABLE admin_messages (
   time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user) REFERENCES users(user_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
--- Admin messages table: Stores user messages to admins
--- message_id: Unique identifier for each message
--- user: Foreign key to users table
--- title: Message title
--- message_content: Content of the message
--- time: Timestamp of message creation
 
-
--- Sample admin message data
+-- Add some example messages to admin_messages table
 INSERT INTO admin_messages (user, title, message_content, time) VALUES
 (3, 'Technical Issue with Image Upload', 'Hello, I''ve been trying to upload an image to my post but keep getting an error. The image is under 5MB and is a JPG file. Could you please look into this?', '2024-03-14 14:22:15'),
 (4, 'Request for New Module Addition', 'Could we get a new module added for Mobile App Development? Many students have expressed interest in this topic.', '2024-03-13 11:45:30'),
@@ -169,11 +116,4 @@ CREATE TABLE likes(
     FOREIGN KEY (post) REFERENCES posts(post_id),
     PRIMARY KEY (user, post)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Likes table: Stores user likes/dislikes on posts
--- user: Foreign key to users table
--- post: Foreign key to posts table
--- isLike: 1 for like, 0 for dislike, null for no interaction
-
-
 COMMIT;

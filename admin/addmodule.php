@@ -20,13 +20,13 @@ try {
         // Insert the new module
         $sql = 'INSERT INTO modules (module_id, module_name, lecturer) 
                 VALUES (:module_id, :module_name, :lecturer)';
-        //Execute query
+        // Complete the SQL query
         query($pdo, $sql, [
             'module_id' => $_POST['module_id'],
             'module_name' => $_POST['module_name'],
             'lecturer' => $_POST['lecturer']
         ]);
-        //Redirect to manage modules after successful addition
+        // Redirect to manage_modules page
         header('Location: manage_modules.php');
         exit();
     } else {

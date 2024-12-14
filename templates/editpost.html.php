@@ -26,6 +26,11 @@
         </div>
 
         <div class="form-group">
+            <label for="image_path">Current Image</label>
+            <img src="<?= htmlspecialchars($posts['image_path']) ?>" alt="Current Post Image" class="img-fluid">
+        </div>
+
+        <div class="form-group">
             <label for="image_path">Update Image</label>
             <input type="file" 
                 name="image_path" 

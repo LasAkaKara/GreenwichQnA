@@ -1,13 +1,14 @@
 function handleLike(postId, action) {
-    // Send like/dislike request to server
+    // Fetch the like.php file
     fetch('actions/like.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `post_id=${postId}&action=${action}`
+        body: `post_id=${postId}&action=${action}` // Send the post_id and action to the like.php file
     })
-    .then(response => response.json()) // Parse response as JSON
+    // Parse the response as JSON
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
             // Update like/dislike counts
@@ -27,5 +28,5 @@ function handleLike(postId, action) {
             }
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Error:', error)); // Catch any errors
 } 

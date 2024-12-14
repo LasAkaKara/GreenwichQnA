@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit();
@@ -11,7 +10,7 @@ try {
     include '../includes/DatabaseConnector.php';
     include '../includes/DatabaseFunctions.php';
 
-    // Soft delete the user account
+    // Soft delete the user
     $sql = 'UPDATE users SET isDeleted = 1 WHERE user_id = :id';
     query($pdo, $sql, ['id' => $_SESSION['user_id']]);
 

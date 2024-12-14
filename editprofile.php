@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
@@ -10,9 +9,9 @@ if (!isset($_SESSION['user_id'])) {
 try {
     include 'includes/DatabaseConnector.php';
     include 'includes/DatabaseFunctions.php';
-
+    // Set current page to profile for the navigation bar
     $currentPage = 'profile';
-    
+    // If the form is submitted, update the user information
     if (isset($_POST['username']) && isset($_POST['email'])) {
         $username = $_POST['username'];
         $email = $_POST['email'];
@@ -35,12 +34,10 @@ try {
             $sql .= ', profile_picture = :avatar';
             $parameters['avatar'] = $target_file;
         }
-
-        // Complete and execute query
+        // Complete the SQL query
         $sql .= ' WHERE user_id = :id';
         query($pdo, $sql, $parameters);
-
-        // Redirect to profile after successful update
+        // Redirect to profile page
         header('Location: profile.php');
         exit();
     }

@@ -1,55 +1,47 @@
 <?php
 session_start();
 
-// If user is already logged in, redirect to feed
+// If user is already logged in, redirect appropriately
 if (isset($_SESSION['user_id'])) {
     header('Location: feed.php');
     exit();
 }
 
-try {
-    // Include database connections
-    include 'includes\DatabaseConnector.php';
-    include 'includes\DatabaseFunctions.php';
+if (isset($_POST['login'])) {
+    try {
+        include 'includes/DatabaseConnector.php';
+        include 'includes/DatabaseFunctions.php';
 
-    // Handle login form submission
-    if (isset($_POST['submit'])) {
-        // Get user credentials from form
         $email = $_POST['email'];
-        $password = md5($_POST['password']); // Hash password (Note: md5 not recommended for production)
+        $password = md5($_POST['password']);
 
         // Query to check user credentials
-        $sql = 'SELECT user_id, username, isAdmin, profile_picture FROM users 
+        $sql = 'SELECT user_id, username, email, password, isAdmin 
+                FROM users 
                 WHERE email = :email AND password = :password AND isDeleted = 0';
-        
-        $user = query($pdo, $sql, [
+
+        $result = query($pdo, $sql, [
             'email' => $email,
             'password' => $password
         ])->fetch();
 
-        // If user found, set session and redirect
-        if ($user) {
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['isAdmin'] = $user['isAdmin'];
-            $_SESSION['user_avatar'] = $user['profile_picture'];
-            
+        if ($result) {
+            // Store user data in session
+            $_SESSION['user_id'] = $result['user_id'];
+            $_SESSION['username'] = $result['username'];
+            $_SESSION['email'] = $result['email'];
+            $_SESSION['isAdmin'] = $result['isAdmin'];
+            // Redirect to feed page
             header('Location: feed.php');
             exit();
         } else {
-            $error = 'Invalid login credentials';
+            // If credentials are invalid, set error message
+            $error = 'Invalid email or password';
         }
+    } catch (PDOException $e) {
+        $error = 'Database error: ' . $e->getMessage();
     }
-
-    $title = 'Login';
-    
-    // Load login template
-    ob_start();
-    include 'templates\login.html.php';
-    $output = ob_get_clean();
-
-} catch (PDOException $e) {
-    $title = 'An error has occurred';
-    $output = 'Database error: ' . $e->getMessage();
 }
-?>
+
+// Display login form
+include 'templates/login.html.php';

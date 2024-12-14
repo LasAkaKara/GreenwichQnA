@@ -17,7 +17,7 @@ try {
             FROM admin_messages 
             LEFT JOIN users ON admin_messages.user = users.user_id 
             ORDER BY admin_messages.time DESC';
-    //Fetch all messages
+    // Fetch all messages
     $messages = query($pdo, $sql)->fetchAll();
 
     $title = 'Admin Messages';

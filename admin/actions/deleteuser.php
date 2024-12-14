@@ -15,6 +15,11 @@ try {
         // Delete user's content first (posts, answers, comments)
         $parameters = [':user_id' => $_POST['user_id']];
         
+        // Delete or update user's content (you might want to mark as deleted instead)
+        query($pdo, 'DELETE FROM comments WHERE author = :user_id', $parameters);
+        query($pdo, 'DELETE FROM answers WHERE author = :user_id', $parameters);
+        query($pdo, 'DELETE FROM posts WHERE author = :user_id', $parameters);
+        
         // Finally delete the user
         query($pdo, 'DELETE FROM users WHERE user_id = :user_id', $parameters);
     }

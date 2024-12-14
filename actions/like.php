@@ -1,7 +1,5 @@
 <?php
 session_start();
-
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit();
@@ -11,7 +9,6 @@ try {
     include '../includes/DatabaseConnector.php';
     include '../includes/DatabaseFunctions.php';
 
-    // Check if necessary parameters are provided
     if (isset($_POST['post_id']) && isset($_POST['action'])) {
         $post_id = $_POST['post_id'];
         $user_id = $_SESSION['user_id'];
@@ -44,7 +41,7 @@ try {
                 ]);
             }
         } else {
-            // Create new interaction
+            // New interaction
             $sql = 'INSERT INTO likes (user, post, isLike) VALUES (:user, :post, :isLike)';
             query($pdo, $sql, [
                 'user' => $user_id,
@@ -69,7 +66,6 @@ try {
         exit();
     }
 } catch (PDOException $e) {
-    // Return error response
     header('Content-Type: application/json');
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 } 
