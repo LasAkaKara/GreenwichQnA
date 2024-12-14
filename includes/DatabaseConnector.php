@@ -1,0 +1,1 @@
+<?php $pdo = new PDO('mysql:host=localhost; dbname=greenqa; charset=utf8mb4', 'root', '')?>
